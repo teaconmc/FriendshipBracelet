@@ -1,10 +1,12 @@
 package com.github.teaconmc.friendshipbracelet.item;
 
-import com.github.teaconmc.friendshipbracelet.data.FriendshipData;
+import com.github.teaconmc.friendshipbracelet.entity.data.FriendshipData;
 import com.github.teaconmc.friendshipbracelet.init.ModItems;
 import com.github.teaconmc.friendshipbracelet.item.component.FriendshipContents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -40,6 +42,7 @@ public class ItemFriendshipBracelet extends Item {
         // 如果主人栏为空，写入主人
         if (Util.NIL_UUID.equals(ownerId)) {
             itemInHand.set(ModItems.FRIENDSHIP_CONTENTS.value(), new FriendshipContents(userId, Util.NIL_UUID, userName, StringUtils.EMPTY));
+            sendMessage(player, Component.translatable("message.friendship_bracelet.friendship_bracelet.owner.success"));
             return InteractionResultHolder.success(itemInHand);
         }
         // 如果朋友栏为空
@@ -47,9 +50,10 @@ public class ItemFriendshipBracelet extends Item {
             // 和主人栏 ID 不同，那就是朋友
             if (!ownerId.equals(userId)) {
                 itemInHand.set(ModItems.FRIENDSHIP_CONTENTS.value(), new FriendshipContents(ownerId, userId, ownerName, userName));
+                sendMessage(player, Component.translatable("message.friendship_bracelet.friendship_bracelet.friend.success", ownerName));
                 return InteractionResultHolder.success(itemInHand);
             } else {
-                player.sendSystemMessage(Component.literal("不能和自己做朋友！"));
+                sendMessage(player, Component.translatable("message.friendship_bracelet.friendship_bracelet.owner.same"));
                 return InteractionResultHolder.fail(itemInHand);
             }
         }
@@ -57,9 +61,10 @@ public class ItemFriendshipBracelet extends Item {
         if (ownerId.equals(userId)) {
             player.setData(FriendshipData.ATTACHMENT_TYPE, FriendshipData.getInstance(contents));
             player.getItemInHand(usedHand).shrink(1);
+            sendMessage(player, Component.translatable("message.friendship_bracelet.friendship_bracelet.owner.equip"));
             return InteractionResultHolder.consume(itemInHand);
         } else {
-            player.sendSystemMessage(Component.literal("这是你东西么？一天天的乱拿"));
+            sendMessage(player, Component.translatable("message.friendship_bracelet.friendship_bracelet.owner.not"));
             return InteractionResultHolder.fail(itemInHand);
         }
     }
@@ -68,12 +73,23 @@ public class ItemFriendshipBracelet extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag tooltipFlag) {
         FriendshipContents contents = stack.get(ModItems.FRIENDSHIP_CONTENTS.value());
         if (contents != null) {
-            UUID owner = contents.ownerId();
-            if (Util.NIL_UUID.equals(owner)) {
-                components.add(Component.literal("No Owner"));
-            } else {
-                components.add(Component.literal("Hahaha"));
+            UUID ownerId = contents.ownerId();
+            String ownerName = contents.ownerName();
+            UUID friendId = contents.friendId();
+            String friendName = contents.friendName();
+
+            if (!Util.NIL_UUID.equals(ownerId)) {
+                components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.owner", ownerName).withStyle(ChatFormatting.GRAY));
             }
+            if (!Util.NIL_UUID.equals(friendId)) {
+                components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.friend", friendName).withStyle(ChatFormatting.GRAY));
+            }
+        }
+    }
+
+    private void sendMessage(Player player, MutableComponent component) {
+        if (!player.level().isClientSide()) {
+            player.sendSystemMessage(component);
         }
     }
 }

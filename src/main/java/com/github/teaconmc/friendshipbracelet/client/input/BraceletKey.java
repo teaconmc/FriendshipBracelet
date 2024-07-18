@@ -1,7 +1,7 @@
 package com.github.teaconmc.friendshipbracelet.client.input;
 
 import com.github.teaconmc.friendshipbracelet.FriendshipBracelet;
-import com.github.teaconmc.friendshipbracelet.data.RequestOpen;
+import com.github.teaconmc.friendshipbracelet.network.RequestServerPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ public class BraceletKey {
     @SubscribeEvent
     public static void onKeyboardInput(InputEvent.Key event) {
         if (isInGame() && event.getAction() == GLFW.GLFW_PRESS && BRACELET_KEY.matches(event.getKey(), event.getScanCode())) {
-            PacketDistributor.sendToServer(new RequestOpen());
+            PacketDistributor.sendToServer(RequestServerPayload.openFriendshipMenu());
         }
     }
 

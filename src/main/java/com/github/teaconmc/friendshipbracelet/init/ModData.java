@@ -1,7 +1,7 @@
 package com.github.teaconmc.friendshipbracelet.init;
 
 import com.github.teaconmc.friendshipbracelet.FriendshipBracelet;
-import com.github.teaconmc.friendshipbracelet.data.FriendshipData;
+import com.github.teaconmc.friendshipbracelet.entity.data.FriendshipData;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;

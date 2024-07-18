@@ -1,9 +1,7 @@
 package com.github.teaconmc.friendshipbracelet.init;
 
 import com.github.teaconmc.friendshipbracelet.FriendshipBracelet;
-import com.github.teaconmc.friendshipbracelet.data.FriendshipData;
-import com.github.teaconmc.friendshipbracelet.data.RequestOpen;
-import net.minecraft.network.codec.StreamCodec;
+import com.github.teaconmc.friendshipbracelet.network.RequestServerPayload;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -16,7 +14,6 @@ public class NetworkRegister {
     @SubscribeEvent
     public static void registerPayload(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(VERSION);
-        registrar.playToClient(FriendshipData.NETWORK_TYPE, FriendshipData.STREAM_CODEC, FriendshipData::clientHandler);
-        registrar.playToServer(RequestOpen.NETWORK_TYPE, StreamCodec.unit(new RequestOpen()), RequestOpen::serverHandler);
+        registrar.playToServer(RequestServerPayload.NETWORK_TYPE, RequestServerPayload.STREAM_CODEC, RequestServerPayload::serverHandler);
     }
 }
