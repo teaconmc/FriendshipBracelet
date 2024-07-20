@@ -64,6 +64,8 @@ public class RequestServerPayload implements CustomPacketPayload {
             if (friendPlayer != null && friendPlayer.isAlive()) {
                 FriendshipData friendPlayerData = friendPlayer.getData(ModData.FRIENDSHIP_BRACELET.get());
                 data.setFriendShareInv(friendPlayerData.isMyselfShareInv());
+            } else {
+                data.setFriendShareInv(false);
             }
             SimpleMenuProvider provider = new SimpleMenuProvider((id, inventory, playerIn) -> new FriendshipContainer(id, inventory, data), title);
             serverPlayer.openMenu(provider, buf -> FriendshipData.STREAM_CODEC.encode(buf, data));

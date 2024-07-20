@@ -29,8 +29,29 @@ public class FriendshipContainer extends AbstractContainerMenu {
     }
 
     @Override
+    @SuppressWarnings("all")
     public ItemStack quickMoveStack(Player player, int index) {
-        return null;
+        ItemStack stack1 = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        int indexSize = this.friendshipData.isFriendShareInv() ? 36 : 9;
+        boolean reverseDirection = this.friendshipData.isFriendShareInv();
+        if (slot != null && slot.hasItem()) {
+            ItemStack stack2 = slot.getItem();
+            stack1 = stack2.copy();
+            if (index < indexSize) {
+                if (!this.moveItemStackTo(stack2, indexSize, this.slots.size(), !reverseDirection)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.moveItemStackTo(stack2, 0, indexSize, reverseDirection)) {
+                return ItemStack.EMPTY;
+            }
+            if (stack2.isEmpty()) {
+                slot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+        }
+        return stack1;
     }
 
     @Override
