@@ -1,10 +1,12 @@
 package com.github.teaconmc.friendshipbracelet.item;
 
+import com.github.teaconmc.friendshipbracelet.client.input.BraceletKey;
 import com.github.teaconmc.friendshipbracelet.entity.data.FriendshipData;
 import com.github.teaconmc.friendshipbracelet.init.ModItems;
 import com.github.teaconmc.friendshipbracelet.item.component.FriendshipContents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class ItemFriendshipBracelet extends Item {
@@ -77,14 +80,25 @@ public class ItemFriendshipBracelet extends Item {
             String ownerName = contents.ownerName();
             UUID friendId = contents.friendId();
             String friendName = contents.friendName();
+            boolean hasInfo = false;
 
             if (!Util.NIL_UUID.equals(ownerId)) {
-                components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.owner", ownerName).withStyle(ChatFormatting.GRAY));
+                components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.owner", ownerName).withStyle(ChatFormatting.GOLD));
+                hasInfo = true;
             }
             if (!Util.NIL_UUID.equals(friendId)) {
-                components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.friend", friendName).withStyle(ChatFormatting.GRAY));
+                components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.friend", friendName).withStyle(ChatFormatting.GREEN));
+                hasInfo = true;
+            }
+            if (hasInfo) {
+                components.add(CommonComponents.space());
             }
         }
+        components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.usage.1").withStyle(ChatFormatting.GRAY));
+        components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.usage.2").withStyle(ChatFormatting.GRAY));
+        components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.usage.3").withStyle(ChatFormatting.GRAY));
+        String keyName = Component.keybind(BraceletKey.BRACELET_KEY.getName()).getString().toUpperCase(Locale.ENGLISH);
+        components.add(Component.translatable("tooltip.friendship_bracelet.friendship_bracelet.usage.4", keyName).withStyle(ChatFormatting.GRAY));
     }
 
     private void sendMessage(Player player, MutableComponent component) {

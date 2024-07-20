@@ -8,10 +8,17 @@
   "message.friendship_bracelet.friendship_bracelet.friend.success": "Successfully befriended %s",
   "tooltip.friendship_bracelet.friendship_bracelet.owner": "Owner: %s",
   "tooltip.friendship_bracelet.friendship_bracelet.friend": "Friend: %s",
+  "tooltip.friendship_bracelet.friendship_bracelet.usage.1": "1. First, right click with the item in mainhand",
+  "tooltip.friendship_bracelet.friendship_bracelet.usage.2": "2. Next, ask your friend to right click with the item",
+  "tooltip.friendship_bracelet.friendship_bracelet.usage.3": "3. Then, you equip it by right click",
+  "tooltip.friendship_bracelet.friendship_bracelet.usage.4": "4. At last, Press %s to open the friends menu",
   "screen.friendship_bracelet.friendship.name": "Friendship Menu",
   "screen.friendship_bracelet.friendship.player.empty": "You have no friends!",
   "screen.friendship_bracelet.friendship.player.online": "%s (Online)",
   "screen.friendship_bracelet.friendship.player.offline": "%s (Offline)",
   "screen.friendship_bracelet.friendship.teleport": "Teleport To Friend",
-  "screen.friendship_bracelet.friendship.share": "Share Inventory"
+  "screen.friendship_bracelet.friendship.share": "Share Inventory",
+  "render.friendship_bracelet.friendship.prefix": "[Friend]",
+  "key.category.friendship_bracelet": "Friendship Badge",
+  "key.friendship_bracelet.bracelet.desc": "Open Friendship Menu"
 }

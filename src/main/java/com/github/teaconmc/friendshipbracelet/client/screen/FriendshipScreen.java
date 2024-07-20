@@ -56,10 +56,16 @@ public class FriendshipScreen extends AbstractContainerScreen<FriendshipContaine
         super.init();
 
         // 传送按钮
-        this.addRenderableWidget(Button.builder(Component.translatable("screen.friendship_bracelet.friendship.teleport"), b -> {
+        Button teleportButton = Button.builder(Component.translatable("screen.friendship_bracelet.friendship.teleport"), b -> {
             PacketDistributor.sendToServer(RequestServerPayload.teleportToFriend());
             this.onClose();
-        }).size(123, 20).pos(leftPos + 45, topPos + 30).build());
+        }).size(123, 20).pos(leftPos + 45, topPos + 30).build();
+        this.addRenderableWidget(teleportButton);
+
+        // 如果朋友离线，那么传送按钮无法启用
+        if (!friendIsOnline(getMinecraft().player)) {
+            teleportButton.active = false;
+        }
 
         // 是否分享自己的物品栏
         this.addRenderableWidget(Checkbox.builder(CommonComponents.EMPTY, font).selected(friendshipData.isMyselfShareInv()).onValueChange((checkbox, value) -> {
@@ -91,6 +97,8 @@ public class FriendshipScreen extends AbstractContainerScreen<FriendshipContaine
         }
         // 渲染是否分享自己背包的按钮
         this.renderShareButton(graphics);
+        // 渲染文本提示
+        this.renderTooltip(graphics, mouseX, mouseY);
     }
 
     private void renderFriendAvatar(GuiGraphics graphics) {
@@ -110,12 +118,9 @@ public class FriendshipScreen extends AbstractContainerScreen<FriendshipContaine
             graphics.drawString(font, emptyText, leftPos + 45, topPos + 20, 0xAA0000, false);
             return;
         }
-        // 有朋友时
-        Collection<PlayerInfo> players = player.connection.getListedOnlinePlayers();
-        UUID friendId = friendshipData.getFriendId();
-        String friendName = friendshipData.getFriendName();
         // 朋友在线或者离线
-        if (players.stream().anyMatch(info -> info.getProfile().getId().equals(friendId))) {
+        String friendName = friendshipData.getFriendName();
+        if (this.friendIsOnline(player)) {
             MutableComponent onlineText = Component.translatable("screen.friendship_bracelet.friendship.player.online", friendName);
             graphics.drawString(font, onlineText, leftPos + 45, topPos + 20, ChatFormatting.DARK_PURPLE.getColor(), false);
         } else {
@@ -127,6 +132,18 @@ public class FriendshipScreen extends AbstractContainerScreen<FriendshipContaine
     private void renderShareButton(GuiGraphics graphics) {
         MutableComponent checkboxText = Component.translatable("screen.friendship_bracelet.friendship.share");
         graphics.drawString(font, checkboxText, leftPos + 148 - font.width(checkboxText), topPos + 66, 0x404040, false);
+    }
+
+    private boolean friendIsOnline(@Nullable LocalPlayer player) {
+        if (player == null) {
+            return false;
+        }
+        if (friendIdIsEmpty()) {
+            return false;
+        }
+        Collection<PlayerInfo> players = player.connection.getListedOnlinePlayers();
+        final UUID friendId = friendshipData.getFriendId();
+        return players.stream().anyMatch(info -> info.getProfile().getId().equals(friendId));
     }
 
     private boolean friendIdIsEmpty() {
