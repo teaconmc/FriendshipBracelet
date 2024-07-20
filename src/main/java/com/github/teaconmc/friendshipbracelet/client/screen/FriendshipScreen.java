@@ -3,14 +3,16 @@ package com.github.teaconmc.friendshipbracelet.client.screen;
 import com.github.teaconmc.friendshipbracelet.FriendshipBracelet;
 import com.github.teaconmc.friendshipbracelet.entity.data.FriendshipData;
 import com.github.teaconmc.friendshipbracelet.inventory.FriendshipContainer;
+import com.github.teaconmc.friendshipbracelet.network.RequestServerPayload;
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -18,16 +20,16 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public class FriendshipScreen extends AbstractContainerScreen<FriendshipContainer> {
     private static final ResourceLocation BG = ResourceLocation.fromNamespaceAndPath(FriendshipBracelet.MOD_ID, "textures/screen/friendship.png");
-
     private final FriendshipData friendshipData;
     private @Nullable GameProfile friendGameProfile;
-    private boolean playerOffline = true;
 
     public FriendshipScreen(FriendshipContainer menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -35,6 +37,16 @@ public class FriendshipScreen extends AbstractContainerScreen<FriendshipContaine
         this.inventoryLabelX = 8;
         this.inventoryLabelY = this.imageHeight - 93;
         this.friendshipData = menu.getFriendshipData();
+        this.updateGameProfile();
+    }
+
+    /**
+     * 更新 GameProfile，从而获取玩家头像
+     */
+    private void updateGameProfile() {
+        if (friendIdIsEmpty()) {
+            return;
+        }
         GameProfile emptyGameProfile = new GameProfile(this.friendshipData.getFriendId(), this.friendshipData.getFriendName());
         SkullBlockEntity.fetchGameProfile(this.friendshipData.getFriendId()).thenApply(gameProfile -> this.friendGameProfile = gameProfile.orElse(emptyGameProfile));
     }
@@ -42,42 +54,82 @@ public class FriendshipScreen extends AbstractContainerScreen<FriendshipContaine
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(Button.builder(Component.translatable("screen.friendship_bracelet.friendship.teleport"),
-                        b -> {
-                        })
-                .size(123, 20)
-                .pos(leftPos + 45, topPos + 30).build());
-        this.addRenderableWidget(Checkbox.builder(CommonComponents.EMPTY, font)
-                .selected(friendshipData.isShareInv())
-                .onValueChange((checkbox, value) -> friendshipData.setShareInv(value))
-                .pos(leftPos + 151, topPos + 62).build());
+
+        // 传送按钮
+        this.addRenderableWidget(Button.builder(Component.translatable("screen.friendship_bracelet.friendship.teleport"), b -> {
+            PacketDistributor.sendToServer(RequestServerPayload.teleportToFriend());
+            this.onClose();
+        }).size(123, 20).pos(leftPos + 45, topPos + 30).build());
+
+        // 是否分享自己的物品栏
+        this.addRenderableWidget(Checkbox.builder(CommonComponents.EMPTY, font).selected(friendshipData.isMyselfShareInv()).onValueChange((checkbox, value) -> {
+            PacketDistributor.sendToServer(RequestServerPayload.changeShareInventory());
+            friendshipData.setMyselfShareInv(value);
+        }).pos(leftPos + 151, topPos + 62).build());
     }
 
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, BG);
+        // 渲染背景
         graphics.blit(BG, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        ResourceLocation skin;
+        // 当没有朋友数据，或者朋友没有分享物品栏，显示灰色界面
+        if (this.friendIdIsEmpty() || !friendshipData.isFriendShareInv()) {
+            graphics.fill(leftPos + 7, topPos + 83, leftPos + 169, topPos + 137, 0xEA404040);
+            graphics.blit(BG, leftPos + 82, topPos + 104, 176, 0, 11, 11);
+        }
+    }
 
-        if (friendGameProfile != null) {
+    @Override
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
+        // 渲染朋友头像
+        this.renderFriendAvatar(graphics);
+        // 渲染朋友名字
+        if (getMinecraft().player != null) {
+            this.renderFriendName(graphics, getMinecraft().player);
+        }
+        // 渲染是否分享自己背包的按钮
+        this.renderShareButton(graphics);
+    }
+
+    private void renderFriendAvatar(GuiGraphics graphics) {
+        ResourceLocation skin;
+        if (!this.friendIdIsEmpty() && friendGameProfile != null) {
             skin = getMinecraft().getSkinManager().getInsecureSkin(friendGameProfile).texture();
         } else {
             skin = DefaultPlayerSkin.get(friendshipData.getFriendId()).texture();
         }
-        RenderSystem.setShaderTexture(0, skin);
         graphics.blit(skin, leftPos + 8, topPos + 18, 32, 32, 32, 32, 256, 256);
+    }
 
-        if (getMinecraft().player != null) {
-            Collection<PlayerInfo> players = getMinecraft().player.connection.getListedOnlinePlayers();
-            if (players.stream().anyMatch(info -> info.getProfile().getId().equals(friendshipData.getFriendId()))) {
-                graphics.drawString(font, Component.translatable("screen.friendship_bracelet.friendship.player.online", friendshipData.getFriendName()), leftPos + 45, topPos + 20, 0x404040, false);
-            } else {
-                graphics.drawString(font, Component.translatable("screen.friendship_bracelet.friendship.player.offline", friendshipData.getFriendName()), leftPos + 45, topPos + 20, 0x404040, false);
-            }
+    private void renderFriendName(GuiGraphics graphics, LocalPlayer player) {
+        // 没朋友时，渲染提示
+        if (friendIdIsEmpty()) {
+            MutableComponent emptyText = Component.translatable("screen.friendship_bracelet.friendship.player.empty");
+            graphics.drawString(font, emptyText, leftPos + 45, topPos + 20, 0xAA0000, false);
+            return;
         }
+        // 有朋友时
+        Collection<PlayerInfo> players = player.connection.getListedOnlinePlayers();
+        UUID friendId = friendshipData.getFriendId();
+        String friendName = friendshipData.getFriendName();
+        // 朋友在线或者离线
+        if (players.stream().anyMatch(info -> info.getProfile().getId().equals(friendId))) {
+            MutableComponent onlineText = Component.translatable("screen.friendship_bracelet.friendship.player.online", friendName);
+            graphics.drawString(font, onlineText, leftPos + 45, topPos + 20, ChatFormatting.DARK_PURPLE.getColor(), false);
+        } else {
+            MutableComponent offlineText = Component.translatable("screen.friendship_bracelet.friendship.player.offline", friendName);
+            graphics.drawString(font, offlineText, leftPos + 45, topPos + 20, 0x404040, false);
+        }
+    }
+
+    private void renderShareButton(GuiGraphics graphics) {
         MutableComponent checkboxText = Component.translatable("screen.friendship_bracelet.friendship.share");
         graphics.drawString(font, checkboxText, leftPos + 148 - font.width(checkboxText), topPos + 66, 0x404040, false);
+    }
+
+    private boolean friendIdIsEmpty() {
+        return Util.NIL_UUID.equals(friendshipData.getFriendId());
     }
 }

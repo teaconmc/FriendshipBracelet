@@ -17,8 +17,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(value = Dist.CLIENT, modid = FriendshipBracelet.MOD_ID)
 public class BraceletKey {
     public static final KeyMapping BRACELET_KEY = new KeyMapping("key.friendship_bracelet.bracelet.desc",
-            KeyConflictContext.IN_GAME, KeyModifier.ALT,
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
+            KeyConflictContext.IN_GAME, KeyModifier.ALT, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
             "key.category.friendship_bracelet");
 
     @SubscribeEvent

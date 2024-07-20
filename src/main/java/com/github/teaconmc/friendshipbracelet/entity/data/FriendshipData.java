@@ -20,24 +20,27 @@ public class FriendshipData implements INBTSerializable<CompoundTag> {
     public static final StreamCodec<ByteBuf, FriendshipData> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, FriendshipData::getFriendId,
             ByteBufCodecs.STRING_UTF8, FriendshipData::getFriendName,
-            ByteBufCodecs.BOOL, FriendshipData::isShareInv,
+            ByteBufCodecs.BOOL, FriendshipData::isMyselfShareInv,
+            ByteBufCodecs.BOOL, FriendshipData::isFriendShareInv,
             FriendshipData::new
     );
-
     private UUID friendId;
     private String friendName;
-    private boolean shareInv;
+    private boolean myselfShareInv;
+    private boolean friendShareInv;
 
     public FriendshipData() {
         this.friendId = Util.NIL_UUID;
         this.friendName = StringUtils.EMPTY;
-        this.shareInv = false;
+        this.myselfShareInv = false;
+        this.friendShareInv = false;
     }
 
-    public FriendshipData(UUID friendId, String friendName, boolean shareInv) {
+    public FriendshipData(UUID friendId, String friendName, boolean myselfShareInv, boolean friendShareInv) {
         this.friendId = friendId;
         this.friendName = friendName;
-        this.shareInv = shareInv;
+        this.myselfShareInv = myselfShareInv;
+        this.friendShareInv = friendShareInv;
     }
 
     public static FriendshipData getInstance(FriendshipContents contents) {
@@ -53,7 +56,8 @@ public class FriendshipData implements INBTSerializable<CompoundTag> {
         CompoundTag tag = new CompoundTag();
         tag.putUUID("FriendId", friendId);
         tag.putString("FriendName", friendName);
-        tag.putBoolean("ShareInv", shareInv);
+        tag.putBoolean("MyselfShareInv", myselfShareInv);
+        tag.putBoolean("FriendShareInv", friendShareInv);
         return tag;
     }
 
@@ -61,7 +65,8 @@ public class FriendshipData implements INBTSerializable<CompoundTag> {
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         this.friendId = nbt.getUUID("FriendId");
         this.friendName = nbt.getString("FriendName");
-        this.shareInv = nbt.getBoolean("ShareInv");
+        this.myselfShareInv = nbt.getBoolean("MyselfShareInv");
+        this.friendShareInv = nbt.getBoolean("FriendShareInv");
     }
 
     public UUID getFriendId() {
@@ -72,19 +77,19 @@ public class FriendshipData implements INBTSerializable<CompoundTag> {
         return friendName;
     }
 
-    public boolean isShareInv() {
-        return shareInv;
+    public boolean isMyselfShareInv() {
+        return myselfShareInv;
     }
 
-    public void setFriendId(UUID friendId) {
-        this.friendId = friendId;
+    public boolean isFriendShareInv() {
+        return friendShareInv;
     }
 
-    public void setFriendName(String friendName) {
-        this.friendName = friendName;
+    public void setMyselfShareInv(boolean myselfShareInv) {
+        this.myselfShareInv = myselfShareInv;
     }
 
-    public void setShareInv(boolean shareInv) {
-        this.shareInv = shareInv;
+    public void setFriendShareInv(boolean friendShareInv) {
+        this.friendShareInv = friendShareInv;
     }
 }

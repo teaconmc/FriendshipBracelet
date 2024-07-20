@@ -14,9 +14,7 @@ public class ModItems {
     public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(FriendshipBracelet.MOD_ID);
 
     public static DeferredItem<Item> FRIENDSHIP_BRACELET = ITEMS.register("friendship_bracelet", ItemFriendshipBracelet::new);
-
     public static DeferredHolder<DataComponentType<?>, DataComponentType<FriendshipContents>> FRIENDSHIP_CONTENTS = DATA_COMPONENTS.registerComponentType(
-            "friendship_bracelet",
-            builder -> builder.persistent(FriendshipContents.CODEC).networkSynchronized(FriendshipContents.STREAM_CODEC).cacheEncoding()
+            "friendship_bracelet", builder -> builder.persistent(FriendshipContents.CODEC).networkSynchronized(FriendshipContents.STREAM_CODEC).cacheEncoding()
     );
 }

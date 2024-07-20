@@ -1,6 +1,6 @@
 {
-  "item_group.friendship_bracelet.name": "Friendship Bracelet",
-  "item.friendship_bracelet.friendship_bracelet": "Friendship Bracelet",
+  "item_group.friendship_bracelet.name": "Friendship Badge",
+  "item.friendship_bracelet.friendship_bracelet": "Friendship Badge",
   "message.friendship_bracelet.friendship_bracelet.owner.success": "Successfully written to the owner",
   "message.friendship_bracelet.friendship_bracelet.owner.same": "You can't be friends with yourself",
   "message.friendship_bracelet.friendship_bracelet.owner.not": "You are not the owner of this item",
@@ -9,6 +9,7 @@
   "tooltip.friendship_bracelet.friendship_bracelet.owner": "Owner: %s",
   "tooltip.friendship_bracelet.friendship_bracelet.friend": "Friend: %s",
   "screen.friendship_bracelet.friendship.name": "Friendship Menu",
+  "screen.friendship_bracelet.friendship.player.empty": "You have no friends!",
   "screen.friendship_bracelet.friendship.player.online": "%s (Online)",
   "screen.friendship_bracelet.friendship.player.offline": "%s (Offline)",
   "screen.friendship_bracelet.friendship.teleport": "Teleport To Friend",

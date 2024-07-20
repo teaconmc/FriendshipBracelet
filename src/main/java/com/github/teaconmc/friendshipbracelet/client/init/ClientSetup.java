@@ -13,8 +13,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT, modid = FriendshipBracelet.MOD_ID)
 public class ClientSetup {
     @SubscribeEvent
-    public static void onRegisterScreen(RegisterMenuScreensEvent evt) {
-        evt.register(FriendshipContainer.TYPE, FriendshipScreen::new);
+    public static void onRegisterScreen(RegisterMenuScreensEvent event) {
+        event.register(FriendshipContainer.TYPE, FriendshipScreen::new);
     }
 
     @SubscribeEvent

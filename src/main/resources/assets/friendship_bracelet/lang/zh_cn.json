@@ -1,0 +1,17 @@
+{
+  "item_group.friendship_bracelet.name": "友谊徽章",
+  "item.friendship_bracelet.friendship_bracelet": "友谊徽章",
+  "message.friendship_bracelet.friendship_bracelet.owner.success": "成功写入所有者的名字",
+  "message.friendship_bracelet.friendship_bracelet.owner.same": "你可不能和自己做朋友",
+  "message.friendship_bracelet.friendship_bracelet.owner.not": "这东西似乎不是你的",
+  "message.friendship_bracelet.friendship_bracelet.owner.equip": "成功装备！",
+  "message.friendship_bracelet.friendship_bracelet.friend.success": "成功和 %s 结为了朋友！",
+  "tooltip.friendship_bracelet.friendship_bracelet.owner": "所有者：%s",
+  "tooltip.friendship_bracelet.friendship_bracelet.friend": "朋友：%s",
+  "screen.friendship_bracelet.friendship.name": "朋友菜单",
+  "screen.friendship_bracelet.friendship.player.empty": "你没有朋友！",
+  "screen.friendship_bracelet.friendship.player.online": "%s（在线）",
+  "screen.friendship_bracelet.friendship.player.offline": "%s（离线）",
+  "screen.friendship_bracelet.friendship.teleport": "传送到朋友",
+  "screen.friendship_bracelet.friendship.share": "分享物品栏"
+}
